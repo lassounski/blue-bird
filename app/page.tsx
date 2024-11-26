@@ -1,8 +1,3 @@
-
-
-import { cookies } from "next/headers";
-import AuthButton from "./auth-button-client";
-import { createServerClient } from "@supabase/ssr";
 import { createClient } from "./utils/supabase/server";
 import AuthButtonServer from "./auth-button-server";
 import { redirect } from "next/navigation";
@@ -16,11 +11,10 @@ export default async function Home() {
     redirect('/login')
   }
 
-
   const { data: tweets } = await supabase.from("tweets").select()
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center m-16">
       <AuthButtonServer />
       <pre>
         {JSON.stringify(tweets, null, 2)}

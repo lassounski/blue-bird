@@ -12,6 +12,8 @@ export default async function Login() {
     }
 
     return (
-        <AuthButton session={session} />
+        <div className="flex justify-center items-center m-16">
+            <AuthButton session={session} />
+        </div>
     )
 }
