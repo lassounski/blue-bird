@@ -1,9 +1,10 @@
 import { createClient } from "./utils/supabase/server";
-import AuthButtonServer from "./auth-button-server";
 import { redirect } from "next/navigation";
+
+import AuthButtonServer from "./auth-button-server";
 import SmoothScroll from "./ui/smooth-sroll";
 import NewTweet from "./ui/new-tweet";
-import Likes from "./ui/likes";
+import Tweets from "./ui/tweets";
 
 
 export default async function Home() {
@@ -32,22 +33,7 @@ export default async function Home() {
       <div className="flex flex-col justify-center items-center m-16">
         <AuthButtonServer />
         <NewTweet />
-        <br/>
-        {
-          tweets?.map(tweet => (
-            <div
-              key={tweet.id}
-              className="border border-gray-300 rounded-lg p-4 mb-4 shadow-sm bg-white hover:shadow-md transition-shadow"
-            >
-              <p className="text-gray-900 font-semibold">
-                {tweet.author.name}{" "}
-                <span className="text-gray-500 text-sm">@{tweet.author.username}</span>
-              </p>
-              <p className="mt-2 text-gray-700">{tweet?.title}</p>
-              <Likes tweet={tweet}/>
-            </div>
-          ))
-        }
+        <Tweets tweets={tweets}/>
       </div>
     </SmoothScroll >
   );

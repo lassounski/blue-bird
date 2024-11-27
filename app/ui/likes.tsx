@@ -3,8 +3,12 @@
 import { createClient } from "../utils/supabase/client";
 import { AiOutlineLike } from "react-icons/ai";
 import { useRouter } from "next/navigation";
+import { startTransition } from "react";
 
-export default function Likes({ tweet } : {tweet : TweetWithAuthor}) {
+export default function Likes({ tweet, addOptimisticTweet }: {
+    tweet: TweetWithAuthor;
+    addOptimisticTweet: (newTweet: TweetWithAuthor) => void;
+}) {
     const router = useRouter();
 
     const handleLikes = async () => {
@@ -13,9 +17,16 @@ export default function Likes({ tweet } : {tweet : TweetWithAuthor}) {
 
         if (user) {
             if (tweet.userHasLikedTweet) {
+                startTransition(() => {
+                    addOptimisticTweet({
+                        ...tweet,
+                        likes: tweet.likes - 1,
+                        userHasLikedTweet: !tweet.userHasLikedTweet
+                    })
+                })
                 const { error } = await supabase.from('likes').delete()
-                .eq('tweet_id', tweet.id)
-                .eq('user_id', user.id)
+                    .eq('tweet_id', tweet.id)
+                    .eq('user_id', user.id)
                 if (error) {
                     console.error("Supabase Error:", error);
                 } else {
@@ -23,6 +34,13 @@ export default function Likes({ tweet } : {tweet : TweetWithAuthor}) {
                     router.refresh()
                 }
             } else {
+                startTransition(() => {
+                    addOptimisticTweet({
+                        ...tweet,
+                        likes: tweet.likes + 1,
+                        userHasLikedTweet: !tweet.userHasLikedTweet
+                    })
+                })
                 const { data: _, error } = await supabase.from('likes').insert({ user_id: user.id, tweet_id: tweet.id })
                 if (error) {
                     console.error("Supabase Error:", error);
