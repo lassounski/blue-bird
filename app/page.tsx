@@ -15,18 +15,16 @@ export default async function Home() {
     redirect('/login')
   }
 
-  const { data, error } = await supabase.from("tweets").select("*, profiles(*), likes(*)")
+  const { data, error } = await supabase.from("tweets").select("*, author:profiles(*), likes(*)")
   const tweets = data?.map(tweet => ({
     ...tweet,
-    userHasLikedTweet: tweet.likes.find(like => like.user_id === session.user.id),
+    author: Array.isArray(tweet.author) ? tweet.author[0] : tweet.author,
+    userHasLikedTweet: !!tweet.likes.find(like => like.user_id === session.user.id), //!! in front of this converts it to boolean even if the value from find is undefined
     likes: tweet.likes.length
-  }))
+  })) ?? [];
 
   if (error) {
-    console.error("Supabase Error:", error.message);
-    // Optional: Additional debugging info
-    console.error("Error Details:", error.details);
-    console.error("Error Hint:", error.hint);
+    console.error("Supabase Error:", error);
   }
 
   return (
@@ -42,8 +40,8 @@ export default async function Home() {
               className="border border-gray-300 rounded-lg p-4 mb-4 shadow-sm bg-white hover:shadow-md transition-shadow"
             >
               <p className="text-gray-900 font-semibold">
-                {tweet?.profiles?.name}{" "}
-                <span className="text-gray-500 text-sm">@{tweet?.profiles?.username}</span>
+                {tweet.author.name}{" "}
+                <span className="text-gray-500 text-sm">@{tweet.author.username}</span>
               </p>
               <p className="mt-2 text-gray-700">{tweet?.title}</p>
               <Likes tweet={tweet}/>

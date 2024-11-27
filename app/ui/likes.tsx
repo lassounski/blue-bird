@@ -4,7 +4,7 @@ import { createClient } from "../utils/supabase/client";
 import { AiOutlineLike } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 
-export default function Likes({ tweet }) {
+export default function Likes({ tweet } : {tweet : TweetWithAuthor}) {
     const router = useRouter();
 
     const handleLikes = async () => {
@@ -17,10 +17,7 @@ export default function Likes({ tweet }) {
                 .eq('tweet_id', tweet.id)
                 .eq('user_id', user.id)
                 if (error) {
-                    console.error("Supabase Error:", error.message);
-                    // Optional: Additional debugging info
-                    console.error("Error Details:", error.details);
-                    console.error("Error Hint:", error.hint);
+                    console.error("Supabase Error:", error);
                 } else {
                     console.log('Tweet unliked.')
                     router.refresh()
@@ -28,10 +25,7 @@ export default function Likes({ tweet }) {
             } else {
                 const { data: _, error } = await supabase.from('likes').insert({ user_id: user.id, tweet_id: tweet.id })
                 if (error) {
-                    console.error("Supabase Error:", error.message);
-                    // Optional: Additional debugging info
-                    console.error("Error Details:", error.details);
-                    console.error("Error Hint:", error.hint);
+                    console.error("Supabase Error:", error);
                 } else {
                     console.log('Tweet liked.')
                     router.refresh()
